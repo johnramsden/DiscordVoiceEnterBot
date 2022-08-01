@@ -64,7 +64,7 @@ client.once('ready', () => {
 client.on('voiceStateUpdate', (oldState, newState) => {
     // check for bot
     if (oldState.member.user.bot) return;
-    if (oldState.member.user.username !== user) return;
+    if ((oldState.member.user.username !== user) && (user !== "ANY")) return;
 
     // check if leaving
     if (newState.channel === null) {
