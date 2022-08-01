@@ -16,8 +16,7 @@ const logger = winston.createLogger({
     defaultMeta: { service: 'user-service' },
     transports: [
         //
-        // - Write all logs with importance level of `error` or less to `error.log`
-        // - Write all logs with importance level of `info` or less to `combined.log`
+        // - Write all logs with importance level of `info` or less to `info.log`
         //
         new winston.transports.File({ filename: join(__dirname, 'info.log') }),
     ],
@@ -44,12 +43,12 @@ function shuffleArray(array) {
 fs.readdir(directoryPath, function (err, files) {
     //handling error
     if (err) {
-        return logger.info('Unable to scan directory: ' + err);
+        return logger.info(`Unable to scan directory: ${err}`);
     }
     //listing all files using forEach
     files.forEach(function (file) {
         const f = join(directoryPath, file)
-        logger.info("Loading: ", f)
+        logger.info(`Loading: ${f}`)
         audioFiles.push(f)
     });
 
@@ -69,11 +68,11 @@ client.on('voiceStateUpdate', (oldState, newState) => {
 
     // check if leaving
     if (newState.channel === null) {
-        logger.info("Left voice: ", oldState.member.user.username)
+        logger.info(`Left voice: ${oldState.member.user.username}`)
         return;
     }
 
-    logger.info("Joined voice: ", oldState.member.user.username)
+    logger.info(`Joined voice: ${oldState.member.user.username}`)
 
     const connection = joinVoiceChannel({
         channelId: newState.channel.id,
