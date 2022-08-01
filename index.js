@@ -5,6 +5,23 @@ const {joinVoiceChannel, createAudioPlayer, createAudioResource, StreamType} = r
 const {createReadStream} = require('node:fs');
 const {join} = require('node:path');
 const fs = require('fs');
+const winston = require('winston');
+
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.combine(
+        winston.format.timestamp({format: 'YYYY-MM-DD HH:mm:ss'}),
+        winston.format.prettyPrint()
+    ),
+    defaultMeta: { service: 'user-service' },
+    transports: [
+        //
+        // - Write all logs with importance level of `error` or less to `error.log`
+        // - Write all logs with importance level of `info` or less to `combined.log`
+        //
+        new winston.transports.File({ filename: 'info.log' }),
+    ],
+});
 
 // Create a new client instance
 const client = new Client({
@@ -27,22 +44,22 @@ function shuffleArray(array) {
 fs.readdir(directoryPath, function (err, files) {
     //handling error
     if (err) {
-        return console.log('Unable to scan directory: ' + err);
+        return logger.info('Unable to scan directory: ' + err);
     }
     //listing all files using forEach
     files.forEach(function (file) {
         const f = join(directoryPath, file)
-        console.log("Loading: ", f)
+        logger.info("Loading: ", f)
         audioFiles.push(f)
     });
 
-    console.log(`Set audioInd=${audioInd}=${audioFiles[audioInd]}`);
-    console.log(`Found ${audioFiles.length} files`)
+    logger.info(`Set audioInd=${audioInd}=${audioFiles[audioInd]}`);
+    logger.info(`Found ${audioFiles.length} files`)
 });
 
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
-    console.log('Ready!');
+    logger.info('Ready!');
 });
 
 client.on('voiceStateUpdate', (oldState, newState) => {
@@ -52,11 +69,11 @@ client.on('voiceStateUpdate', (oldState, newState) => {
 
     // check if leaving
     if (newState.channel === null) {
-        console.log("Left voice: ", oldState.member.user.username)
+        logger.info("Left voice: ", oldState.member.user.username)
         return;
     }
 
-    console.log("Joined voice: ", oldState.member.user.username)
+    logger.info("Joined voice: ", oldState.member.user.username)
 
     const connection = joinVoiceChannel({
         channelId: newState.channel.id,
@@ -73,7 +90,7 @@ client.on('voiceStateUpdate', (oldState, newState) => {
         audioInd = 0
     }
 
-    console.log(`Set audioInd=${audioInd}=${audioFiles[audioInd]}`)
+    logger.info(`Set audioInd=${audioInd}=${audioFiles[audioInd]}`)
 
     player.play(resource);
 
