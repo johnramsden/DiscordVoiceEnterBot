@@ -66,6 +66,12 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     if (oldState.member.user.bot) return;
     if ((oldState.member.user.username !== user) && (user !== "ANY")) return;
 
+    if (newState.channel !== null && oldState.channel !== null) {
+        if (newState.channel.id === oldState.channel.id) {
+            return;
+        }
+    }
+
     // check if leaving
     if (newState.channel === null) {
         logger.info(`Left voice: ${oldState.member.user.username}`)
